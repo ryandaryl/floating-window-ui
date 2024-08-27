@@ -115,8 +115,8 @@ const Window: React.FC<WindowProps> = (props: WindowProps) => {
     if (minimized) {
       setContentDisplay(true);
       effectiveHeight.current = height;
-      setTop(parent?.offsetTop || 0);
-      setLeft(parent?.offsetLeft || 0);
+      setTop(properties.top || 0);
+      setLeft(properties.left || 0);
       setMinimized(false);
       setMinimizeIcon("▁");
       setMaximized(false);
