@@ -9,6 +9,7 @@ interface WindowProps {
   top?: number;
   left?: number;
   resizable?: boolean;
+  minimized_width?: number;
   titleBar?: {
     icon?: string | HTMLImageElement;
     title?: string;
@@ -43,6 +44,7 @@ const Window: React.FC<WindowProps> = (props: WindowProps) => {
       top: 0,
       left: 0,
       resizable: false,
+      minimized_width: 280,
       titleBar: Object.assign(
         {
           icon: " ",
@@ -115,6 +117,7 @@ const Window: React.FC<WindowProps> = (props: WindowProps) => {
     if (minimized) {
       setContentDisplay(true);
       effectiveHeight.current = height;
+      effectiveWidth.current = width;
       setTop(properties.top || 0);
       setLeft(properties.left || 0);
       setMinimized(false);
@@ -124,7 +127,7 @@ const Window: React.FC<WindowProps> = (props: WindowProps) => {
       setContentDisplay(false);
       effectiveHeight.current = 32;
       const parent = document.getElementById(properties.id)?.parentElement;
-      effectiveWidth.current = width;
+      effectiveWidth.current = props.minimized_width || 32;
       let topPosition =
         (parent?.clientHeight || window.innerHeight) -
         effectiveHeight.current -
