@@ -1,4 +1,4 @@
-import React, { useRef } from "react";
+import React, { useRef, useEffect } from "react";
 import "./Window.css";
 
 interface WindowProps {
@@ -44,6 +44,8 @@ const Window: React.FC<WindowProps> = (props: WindowProps) => {
       top: 0,
       left: 0,
       resizable: false,
+      minimized: false,
+      setMinimized: (arg: boolean) => {arg},
       minimized_width: 280,
       titleBar: Object.assign(
         {
@@ -77,7 +79,6 @@ const Window: React.FC<WindowProps> = (props: WindowProps) => {
   const [left, setLeft] = React.useState<number>(properties.left || 0);
   const [xOffset, setXOffset] = React.useState<number>(0);
   const [yOffset, setYOffset] = React.useState<number>(0);
-  const [minimized, setMinimized] = React.useState<boolean>(false);
   const [maximized, setMaximized] = React.useState<boolean>(false);
   const [minimizeIcon, setMinimizeIcon] = React.useState<string>("▁");
   const [maximizeIcon, setMaximizeIcon] = React.useState<string>("□");
@@ -111,16 +112,15 @@ const Window: React.FC<WindowProps> = (props: WindowProps) => {
     setWindowVisibility(1.0);
   };
 
-  const minimize = () => {
-    setWindowTransition(`${animationDuration}ms ease-in-out`);
+  const minimize = (animate=true) => {
+    if (animate) setWindowTransition(`${animationDuration}ms ease-in-out`);
     const parent = document.getElementById(properties.id)?.parentElement;
-    if (minimized) {
+    if (!properties.minimized) {
       setContentDisplay(true);
       effectiveHeight.current = height;
       effectiveWidth.current = width;
       setTop(properties.top || 0);
       setLeft(properties.left || 0);
-      setMinimized(false);
       setMinimizeIcon("▁");
       setMaximized(false);
     } else {
@@ -151,7 +151,6 @@ const Window: React.FC<WindowProps> = (props: WindowProps) => {
 
       setTop(topPosition);
       setLeft(leftPosition);
-      setMinimized(true);
       setMinimizeIcon("◰");
       setMaximized(false);
     }
@@ -160,7 +159,6 @@ const Window: React.FC<WindowProps> = (props: WindowProps) => {
   };
 
   const maximize = () => {
-    setWindowTransition(`${animationDuration}ms ease-in-out`);
     const parent = document.getElementById(properties.id)?.parentElement;
     if (maximized) {
       setContentDisplay(true);
@@ -170,7 +168,6 @@ const Window: React.FC<WindowProps> = (props: WindowProps) => {
       setLeft(parent?.offsetLeft || 0);
       setMaximized(false);
       setMaximizeIcon("□");
-      setMinimized(false);
       setMinimizeIcon("▁");
     } else {
       setContentDisplay(true);
@@ -180,12 +177,17 @@ const Window: React.FC<WindowProps> = (props: WindowProps) => {
       setLeft(parent?.offsetLeft || 0);
       setMaximized(true);
       setMaximizeIcon("❐");
-      setMinimized(false);
       setMinimizeIcon("▁");
     }
     setLevel(nextZIndex());
-    setTimeout(setWindowTransition, animationDuration + 1, "");
   };
+
+  const [transitionCount, setTransitionCount] = React.useState(0)
+
+  useEffect(() => {
+    minimize(transitionCount > 0)
+    setTransitionCount(transitionCount + 1)
+  }, [properties.minimized])
 
   return (
     <div
@@ -231,7 +233,7 @@ const Window: React.FC<WindowProps> = (props: WindowProps) => {
           {properties.titleBar.buttons && (
             <span className="buttonContainer">
               {properties.titleBar.buttons.minimize && (
-                <span className="windowButton" onClick={minimize}>
+                <span className="windowButton" onClick={() => {properties.setMinimized && properties.setMinimized(!properties.minimized)}}>
                   {minimizeIcon}
                 </span>
               )}
