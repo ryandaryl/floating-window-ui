@@ -134,7 +134,7 @@ const Window: React.FC<WindowProps> = (props: WindowProps) => {
         4;
 
       let leftPosition =
-        (parent?.clientWidth || window.innerWidth) - effectiveWidth.current - 4;
+        (parent?.clientWidth || document.documentElement.clientWidth) - effectiveWidth.current - 4;
 
       const minimizedWindow = document.elementFromPoint(
         leftPosition + effectiveWidth.current / 2,
